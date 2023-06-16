@@ -145,7 +145,7 @@ def _posts(
     if board is None:
         raise HTTPException(status_code=404, detail="Board not found")
 
-    filter = [models.Post.board_id == board.board_id and models.Post.parent_id == None]
+    filter = [models.Post.board_id == board.board_id, models.Post.parent_id == None]
 
     db_posts = db.api_get(
         table=models.Post,
