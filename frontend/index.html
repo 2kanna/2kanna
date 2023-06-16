@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>2k</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="vi.png">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                2<span class="k">k</span>
+            </div> -
+            <div class="board-list">
+            </div>
+            <div class="username-container">
+                <div class="username"></div>
+                <div class="login">[<a href="#">Login</a>]</div>
+                <div class="logout">[<a href="#">Logout</a>]</div>
+            </div>
+        </div>
+        <div class="user-form-container">
+            <div>
+                <h3 class="user-form">Login</h3>
+                <form class="login-form form">
+                    <div class="form-row">
+                        <input type="text" name="username" placeholder="username">
+                    </div>
+                    <div class="form-row">
+                        <input type="password" name="password" placeholder="password">
+                    </div>
+                    <div class="form-row">
+                        <input type="submit" value="Login">
+                    </div>
+                </form>
+            </div>
+            <div>
+                <h3 class="user-form">Register</h3>
+                <form class="register-form form">
+                    <div class="form-row">
+                        <input type="text" name="username" placeholder="username">
+                    </div>
+                    <div class="form-row">
+                        <input type="password" name="password" placeholder="password">
+                    </div>
+                    <div class="form-row">
+                        <input type="submit" value="Register">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="main">
+            <div class="posts-container">
+            </div>
+            <div class="etcetc">
+                <div class="new-post">
+                    <!-- seperate multipart/form-data form to upload file -->
+                    <form class="upload-form form" enctype="multipart/form-data">
+                        <!-- spinner -->
+                        <div class="spinner hidden">
+                        </div>
+                        <div class="form-row">
+                            <input type="file" name="file">
+                        </div>
+                        <div class="form-row">
+                            <input type="submit" value="Upload">
+                        </div>
+                    </form>
+                    <div class="remove-file hidden">
+                        <a href="#">Remove file</a>
+                    </div>
+
+                    <form class="post-form form">
+                        <div class="form-row">
+                            <input type="text" name="title" placeholder="Title">
+                        </div>
+                        <div class="form-row">
+                            <textarea name="message" placeholder="Message" rows="5"></textarea>
+                        </div>
+                        <input type="hidden" name="file_id">
+                        <input type="hidden" name="parent_id">
+                        <div class="form-row">
+                            <input type="submit" value="Post">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <small>󰀁</small>
+            <span id="pagination-container"></span>
+        </div>
+    </div>
+
+</html>
+
+<template id="post">
+    <div class="post">
+        <div class="post-header small-text">
+            <span class="post-title"></span>
+            <span class="post-date"></span>
+            <span class="post-id">No. <a href="#"></a></span>
+            <span class="post-count white-text"></span>
+            <span class="reply-button">[<a href="">Reply</a>]</span>
+        </div>
+        <div class="post-content">
+            <div class="post-file"></div>
+            <div class="post-message"></div>
+        </div>
+        <div class="children"></div>
+    </div>
+</template>
+
+
+<script src="const.js"></script>
+<script type="module" src="script.js"></script>
+
+<script src="auth.js"></script>
+<script src="cache.js"></script>
+<script src="pagination.js"></script>

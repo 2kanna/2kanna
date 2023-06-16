@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: mypassword
+      MARIADB_DATABASE: 2k
+    ports:
+      - 3306:3306
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+  # apiserver:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     - MODE=dev
+  #     - PYTHONDONTWRITEBYTECODE=1
+  #     - PYTHONUNBUFFERED=1
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - ${PWD}:/app
+  #   entrypoint: uvicorn twok.api:app --host 0.0.0.0 --port 8000
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "curl",
+  #         "--fail",
+  #         "http://localhost:8000/health"
+  #       ]
+  #   depends_on:
+  #     - db
