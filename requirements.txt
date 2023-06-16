@@ -1,0 +1,6 @@
+fastapi[all]>=0.95.0
+SQLAlchemy>=2.0.8
+PyMySQL>=1.0.2
+cryptography>=39.0.0
+python-jose[cryptography]
+passlib[bcrypt]

@@ -17,28 +17,37 @@ services:
     restart: always
     ports:
       - 8080:8080
-  # apiserver:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     - MODE=dev
-  #     - PYTHONDONTWRITEBYTECODE=1
-  #     - PYTHONUNBUFFERED=1
-  #   env_file:
-  #     - .env
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - ${PWD}:/app
-  #   entrypoint: uvicorn twok.api:app --host 0.0.0.0 --port 8000
-  #   healthcheck:
-  #     test:
-  #       [
-  #         "CMD",
-  #         "curl",
-  #         "--fail",
-  #         "http://localhost:8000/health"
-  #       ]
-  #   depends_on:
-  #     - db
+  apiserver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - MODE=dev
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${PWD}:/app
+    entrypoint: uvicorn twok.api:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "--fail",
+          "http://localhost:8000/health"
+        ]
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ${PWD}/frontend:/usr/share/nginx/html
+      - ${PWD}/uploads:/usr/share/nginx/html/uploads
