@@ -4,7 +4,7 @@ def test_create_user(client):
             "/user",
             json={
                 "username": "username",
-                "plaintext_password": "pasword",
+                "plaintext_password": "password",
             },
         )
 
@@ -25,7 +25,7 @@ def test_create_user_duplicate(create_user, client):
             "/user",
             json={
                 "username": "username",
-                "plaintext_password": "pasword",
+                "plaintext_password": "password",
             },
         )
     assert response.status_code == 409

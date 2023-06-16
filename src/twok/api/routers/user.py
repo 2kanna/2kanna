@@ -1,12 +1,11 @@
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import Response
 from fastapi.security import OAuth2PasswordRequestForm
 
 from twok.api import dependencies
 
-from twok.api.services.auth import Auth
 from twok.database import schemas, models
 
 

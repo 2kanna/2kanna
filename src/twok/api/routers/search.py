@@ -10,7 +10,9 @@ search_router = APIRouter(
 )
 
 
-@search_router.get("/board/{board_name}/post/{query}", response_model=list[schemas.Post])
+@search_router.get(
+    "/board/{board_name}/post/{query}", response_model=list[schemas.Post]
+)
 def search_post_by_board(posts: dependencies.search_posts):
     return posts
 

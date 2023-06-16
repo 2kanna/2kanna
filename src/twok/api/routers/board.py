@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from twok.api import dependencies
-from twok.database import schemas, models
+from twok.database import schemas
 
 board_router = APIRouter(
     prefix="/board",

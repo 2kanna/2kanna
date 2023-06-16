@@ -3,12 +3,10 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy import (
     ForeignKey,
-    Table,
     Column,
     Integer,
     String,
 )
-from sqlalchemy.schema import UniqueConstraint
 
 from twok.database import Base
 

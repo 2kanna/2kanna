@@ -4,11 +4,6 @@ from typing import Optional
 import sqlalchemy
 from sqlalchemy.sql.elements import UnaryExpression
 
-from twok.database.models import (
-    Board,
-    Post,
-    User,
-)
 
 from twok.database.crud.table.ban import Ban as BanCRUD
 from twok.database.crud.table.board import Board as BoardCRUD
