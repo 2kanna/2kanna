@@ -20,3 +20,11 @@ There is a `Dockerfile` and a `docker-compose.yml` file in this repository. You 
 # configuration
 
 You can configure 2kanna by setting environment variables. Look in `.env` for the default values.
+
+# dev
+
+```bash
+python3.11 -m venv venv
+source venv/bin/activate
+pip install -e .
+```

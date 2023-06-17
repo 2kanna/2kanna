@@ -40,3 +40,7 @@ dist/
 /.vscode/
 
 data/
+
+uploads/*
+!uploads/.gitkeep
+
