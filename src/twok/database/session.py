@@ -32,6 +32,8 @@ class Session:
         else:
             connect_args = {}
 
+        isolation_level = "READ COMMITTED" if self._db_url.startswith("mysql") else None
+
         # To allow us to stream new posts we need to set the isolation level to READ COMMITTED
         # https://mariadb.com/kb/en/set-transaction/#read-committed
         self.__engine = create_engine(
@@ -40,7 +42,7 @@ class Session:
             echo=False,
             pool_size=100,
             max_overflow=200,
-            isolation_level="READ COMMITTED",
+            isolation_level=isolation_level,
         )
 
         connection_attempts = 0
