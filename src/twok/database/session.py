@@ -32,12 +32,15 @@ class Session:
         else:
             connect_args = {}
 
+        # To allow us to stream new posts we need to set the isolation level to READ COMMITTED
+        # https://mariadb.com/kb/en/set-transaction/#read-committed
         self.__engine = create_engine(
             self._db_url,
             connect_args=connect_args,
             echo=False,
             pool_size=100,
             max_overflow=200,
+            isolation_level="READ COMMITTED",
         )
 
         connection_attempts = 0
@@ -63,7 +66,11 @@ class Session:
                     raise e
                 logger.warning("Failed to connect to base. Retrying in 5 seconds.")
                 time.sleep(5)
-        self.Session = sessionmaker(bind=self.__engine)
+        self.Session = sessionmaker(
+            autocommit=False,
+            autoflush=False,
+            bind=self.__engine,
+        )
 
         self.create_default_data()
 

@@ -73,7 +73,7 @@ class PostCreate(PostBase):
 class Post(PostBase):
     post_id: int
     board: BoardBase
-    date: str = None
+    date: str
     file: Optional["FileBase"] = None
     parent_id: Optional[int] = None
     children: list["Post"] = []
