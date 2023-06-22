@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<head>
+    <title>Stream</title>
+</head>
+
+<body>
+    <button id="stop-button">Stop stream</button>
+    <button id="start-button">Start stream</button>
+    <button id="clear-button">Clear list</button>
+
+    <ul id="list"></ul>
+</body>
+
+</html>
+<script>
+    const evtSource = new EventSource("//0.0.0.0:8000/post/stream/1", {
+        // withCredentials: true,
+    });
+
+
+    evtSource.addEventListener("init_post", (event) => {
+        const newElement = document.createElement("li");
+        const eventList = document.getElementById("list");
+
+        // replace single quotes with double quotes
+        const json_string = event.data.replace(/'/g, '"');
+
+        console.log(json_string);
+
+        let parsed = JSON.parse(json_string);
+        console.log(parsed);
+
+        newElement.textContent = `init_post message: ${event.data}`;
+        eventList.appendChild(newElement);
+    });
+
+    evtSource.addEventListener("update_post", (event) => {
+        const newElement = document.createElement("li");
+        const eventList = document.getElementById("list");
+
+        newElement.textContent = `update_post message: ${event.data}`;
+        eventList.appendChild(newElement);
+    });
+
+
+    // evtSource.onmessage = (event) => {
+    //     const newElement = document.createElement("li");
+    //     const eventList = document.getElementById("list");
+
+    //     newElement.textContent = `message: ${event.data}`;
+    //     eventList.appendChild(newElement);
+    // };
+
+    evtSource.onerror = (err) => {
+        console.error("EventSource failed:", err);
+    };
+
+    document.getElementById("stop-button").addEventListener("click", () => {
+        evtSource.close();
+    });
+
+    document.getElementById("start-button").addEventListener("click", () => {
+        evtSource.close();
+        evtSource.open();
+    });
+
+    document.getElementById("clear-button").addEventListener("click", () => {
+        const eventList = document.getElementById("list");
+        eventList.innerHTML = "";
+    });
+</script>

@@ -12,12 +12,30 @@ if (!board) {
         .then(response => response.json())
         .then(posts => renderPosts(posts));
 } else {
-    fetch(`${API_URL}/post/${post}`)
-        .then(response => response.json())
-        .then(post => {
-            renderPosts([post]);
-            document.querySelector('.new-post input[name="parent_id"]').value = post.post_id;
-        });
+    const evtSource = new EventSource(`${API_URL}/post/stream/${post}`);
+
+    evtSource.addEventListener("init_post", (event) => {
+        // replace single quotes with double quotes
+        const json_string = event.data.replace(/'/g, '"');
+        const parsed = JSON.parse(json_string);
+
+        renderPosts([parsed]);
+        document.querySelector('.new-post input[name="parent_id"]').value = parsed.post_id;
+    });
+
+    evtSource.addEventListener("update_post", (event) => {
+        // replace single quotes with double quotes
+        const json_string = event.data.replace(/'/g, '"');
+        const parsed = JSON.parse(json_string);
+
+        console.log(parsed);
+
+        renderPosts(parsed);
+    });
+
+    evtSource.onerror = (err) => {
+        console.error("EventSource failed:", err);
+    };
 }
 
 
