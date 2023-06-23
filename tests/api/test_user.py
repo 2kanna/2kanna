@@ -206,7 +206,5 @@ def test_reset_password(create_admin_token, client):
             json={"plaintext_password": "newpassword"},
         )
 
-    breakpoint()
-
     assert response.status_code == 204
     assert response.text == ""
