@@ -156,3 +156,14 @@ async def delete_user(
     db.user.delete(user)
 
     return None
+
+
+@user_router.post("/reset_password", status_code=204)
+async def reset_password(
+    new_password: schemas.UserResetPassword,
+    current_user: dependencies.current_user,
+    auth: dependencies.auth,
+):
+    auth.reset_password(current_user, new_password.plaintext_password)
+
+    return None

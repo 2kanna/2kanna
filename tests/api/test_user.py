@@ -196,3 +196,17 @@ def test_read_bans(create_admin_token, create_ban, client):
     assert len(response.json()) == 1
     assert response.json()[0]["ban_id"] == 1
     assert response.json()[0]["reason"] == "test ban"
+
+
+def test_reset_password(create_admin_token, client):
+    with client as c:
+        response = c.post(
+            "/user/reset_password",
+            headers={"Authorization": f"Bearer {create_admin_token}"},
+            json={"plaintext_password": "newpassword"},
+        )
+
+    breakpoint()
+
+    assert response.status_code == 204
+    assert response.text == ""
