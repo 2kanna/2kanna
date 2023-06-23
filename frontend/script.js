@@ -28,8 +28,6 @@ if (!board) {
         const json_string = event.data.replace(/'/g, '"');
         const parsed = JSON.parse(json_string);
 
-        console.log(parsed);
-
         renderPosts(parsed);
     });
 
