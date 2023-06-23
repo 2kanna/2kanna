@@ -59,6 +59,12 @@ class Auth:
             password_hash=self.password_hash(user.plaintext_password),
         )
 
+    def reset_password(self, user: models.User, new_password: str):
+        return self.db.user.update(
+            user,
+            password_hash=self.password_hash(new_password),
+        )
+
     def user(self, token: str):
         """
         Get user from token.

@@ -23,6 +23,10 @@ class UserCreate(UserBase):
     plaintext_password: str
 
 
+class UserResetPassword(BaseModel):
+    plaintext_password: str
+
+
 class User(UserBase):
     user_id: int
     user_role: str = "none"
