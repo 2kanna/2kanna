@@ -11,7 +11,6 @@ from fastapi import (
     UploadFile,
     Response,
 )
-from fastapi.encoders import jsonable_encoder
 from sse_starlette.sse import EventSourceResponse
 
 from twok import files
@@ -32,33 +31,25 @@ def read_post(post: dependencies.root_post):
 
 @post_router.get("/stream/{post_id}", response_model=schemas.Post)
 async def stream_data(
-    post: dependencies.root_post,
+    json_post: dependencies.root_json_post,
     background_tasks: BackgroundTasks,
     db: dependencies.database,
 ):
     async def event_generator():
-        encoder_kwargs = dict(
-            exclude={"children", "user_id", "requester_id"},
-            exclude_unset=True,
-            exclude_none=True,
-        )
-
-        json_post_child = jsonable_encoder(
-            post.children,
-            **encoder_kwargs,
-        )
-        json_post = jsonable_encoder(post, **encoder_kwargs)
-        json_post["children"] = json_post_child
         yield dict(event="init_post", data=json_post)
 
-        latest_reply = post.children[-1].post_id if post.children else post.post_id
+        latest_reply = (
+            json_post.get("children")[-1].get("post_id")
+            if json_post.get("children")
+            else json_post.get("post_id")
+        )
 
         while True:
             # [TODO] refactor this so we don't have to poll the database every second
             replies = db.api_get(
                 models.Post,
                 filter=[
-                    models.Post.parent_id == post.post_id,
+                    models.Post.parent_id == json_post.get("post_id"),
                     models.Post.post_id > latest_reply,
                 ],
                 limit=50,
@@ -67,9 +58,16 @@ async def stream_data(
             # Yield the new replies to the client
             if replies:
                 latest_reply = replies[-1].post_id
+
+                json_replies = []
+
+                for reply in replies:
+                    json_reply = dependencies.create_json_post(reply)
+                    json_replies.append(json_reply)
+
                 yield dict(
                     event="update_post",
-                    data=jsonable_encoder(replies, **encoder_kwargs),
+                    data=json_replies,
                 )
 
             # Wait for 1 second before executing the query again
@@ -147,7 +145,6 @@ async def upload_file(
 ):
     file_hash = await files.save_upload_file(file)
 
-    # check if post exists and return 404 if not
     if post_id:
         db_post = db.post.get(filter=[models.Post.post_id == post_id])
         if not db_post:
@@ -173,6 +170,6 @@ def delete_file(
     db: dependencies.database,
     current_user_is_admin: dependencies.current_user_is_admin = None,
 ):
-    db.file.delete(file)
+    files.delete_file(file, db)
 
     return None
