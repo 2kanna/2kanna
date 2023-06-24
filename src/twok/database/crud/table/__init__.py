@@ -1,5 +1,6 @@
 import logging
 import sqlalchemy
+from sqlalchemy.orm.session import Session
 from typing import Optional
 
 logger = logging.getLogger(__name__)
@@ -9,7 +10,7 @@ class Table:
     table: sqlalchemy.Table
     main_column: sqlalchemy.Column
 
-    def __init__(self, session: sqlalchemy.orm.session.Session):
+    def __init__(self, session: Session):
         self._session = session
 
     def get(

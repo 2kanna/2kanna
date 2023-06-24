@@ -1,6 +1,6 @@
 from typing import Optional
 
-import sqlalchemy
+from sqlalchemy.orm.session import Session
 
 from twok.database.crud.table import Table
 from twok.database.models import Post as PostModel
@@ -10,7 +10,7 @@ from twok.database.models import Board as BoardModel
 class Post(Table):
     table = PostModel
 
-    def __init__(self, session: sqlalchemy.orm.session.Session):
+    def __init__(self, session: Session):
         super().__init__(session)
 
         self.main_column = PostModel.title
@@ -22,8 +22,8 @@ class Post(Table):
         # and i can't be bothered to explain why
 
         self._session.add(post)
-        self._session.commit()
 
+        # The `update` method will commit the session for us
         self.update(self.root_parent(post), latest_reply_date=post.date)
 
         return post

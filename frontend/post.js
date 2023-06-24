@@ -50,7 +50,7 @@ function createPost(post) {
             textarea.focus();
         });
     }
-    if (post.children.length > 0) {
+    if ("children" in post && post.children.length > 0) {
         // set the post-count to number of children
         clone.querySelector('.post-count').textContent = `(${post.children.length} replies)`;
     }
@@ -80,8 +80,20 @@ export function renderPosts(posts) {
     const container = document.querySelector('.posts-container');
 
     posts.forEach(post => {
-        const clone = createPost(post);
+        let clone;
+        if ("children" in post) {
+            clone = createPost(post);
+        } else {
+            clone = container.querySelector('.post');
 
+            const child_clone = createPost(post);
+            child_clone.querySelector('.post').classList.add('child');
+            clone.querySelector('.children').appendChild(child_clone);
+
+            return;
+        }
+
+        // children or new replies
         if (post.children.length > 0) {
             post.children.forEach(child => {
                 const child_clone = createPost(child);

@@ -1,8 +1,18 @@
+import asyncio
 import html
 from datetime import datetime
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, HTTPException, Form, UploadFile, Response
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    HTTPException,
+    Form,
+    UploadFile,
+    Response,
+)
+from fastapi.encoders import jsonable_encoder
+from sse_starlette.sse import EventSourceResponse
 
 from twok import files
 from twok.api import dependencies
@@ -18,6 +28,58 @@ post_router = APIRouter(
 @post_router.get("/{post_id}", response_model=schemas.Post)
 def read_post(post: dependencies.root_post):
     return post
+
+
+@post_router.get("/stream/{post_id}", response_model=schemas.Post)
+async def stream_data(
+    post: dependencies.root_post,
+    background_tasks: BackgroundTasks,
+    db: dependencies.database,
+):
+    async def event_generator():
+        encoder_kwargs = dict(
+            exclude={"children", "user_id", "requester_id"},
+            exclude_unset=True,
+            exclude_none=True,
+        )
+
+        json_post_child = jsonable_encoder(
+            post.children,
+            **encoder_kwargs,
+        )
+        json_post = jsonable_encoder(post, **encoder_kwargs)
+        json_post["children"] = json_post_child
+        yield dict(event="init_post", data=json_post)
+
+        latest_reply = post.children[-1].post_id if post.children else post.post_id
+
+        while True:
+            # [TODO] refactor this so we don't have to poll the database every second
+            replies = db.api_get(
+                models.Post,
+                filter=[
+                    models.Post.parent_id == post.post_id,
+                    models.Post.post_id > latest_reply,
+                ],
+                limit=50,
+            )
+
+            # Yield the new replies to the client
+            if replies:
+                latest_reply = replies[-1].post_id
+                yield dict(
+                    event="update_post",
+                    data=jsonable_encoder(replies, **encoder_kwargs),
+                )
+
+            # Wait for 1 second before executing the query again
+            await asyncio.sleep(1)
+
+    # Start the background task to execute the query periodically
+    background_tasks.add_task(event_generator)
+
+    # Return the EventSourceResponse to the client
+    return EventSourceResponse(event_generator())
 
 
 @post_router.options("", response_model=schemas.Post)
@@ -60,7 +122,7 @@ def create_post(
     db_post = db.post.create(
         title=post.title,
         message=post_messaged_escaped,
-        date=datetime.now(),
+        date=str(datetime.now()),
         board_id=db_board.board_id,
         parent_id=post.parent_id,
         user_id=user_id,
