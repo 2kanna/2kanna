@@ -129,13 +129,8 @@ def get_bans(
     db: dependencies.database,
     current_user_is_admin: dependencies.current_user_is_admin = None,
 ):
-    # filter = [models.Post.board_id == board.board_id and models.Post.parent_id == None]
-    # print("hi")
-    # return None
-
     db_bans = db.api_get(
         table=models.Ban,
-        # filter=filter,
         order_by=models.Ban.date.desc(),
         skip=pagination["skip"],
         limit=pagination["limit"],
