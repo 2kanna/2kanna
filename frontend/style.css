@@ -270,6 +270,10 @@ pre {
     color: var(--nord14)
 }
 
+.flex-wrap-wrap {
+    flex-wrap: wrap;
+}
+
 .user-form-container {
     display: none;
     flex-direction: row;
@@ -375,6 +379,11 @@ pre {
     width: 100px;
     height: 100px;
     margin-right: 10px;
+}
+
+.post-image.full-size {
+    width: 100%;
+    height: 100%;
 }
 
 /* footer */
