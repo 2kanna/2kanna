@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Annotated, Dict, Optional
 
 from fastapi import Depends, HTTPException, Request
+from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer
 
 from twok.api.config import Settings
@@ -134,6 +135,35 @@ def _root_post(db_post: models.Post = Depends(_post), db: DB = Depends(_db)):
         db_post = db.post.get(filter=[models.Post.post_id == db_post.parent_id])
 
     return db_post
+
+
+def _root_json_post(db_post: models.Post = Depends(_root_post)):
+    return create_json_post(db_post)
+
+
+def create_json_post(db_post):
+    encoder_kwargs = dict(
+        exclude={"user_id", "requester_id"},
+        exclude_unset=True,
+        exclude_none=True,
+    )
+
+    json_post = jsonable_encoder(db_post, **encoder_kwargs)
+    if db_post.file:
+        json_file = jsonable_encoder(db_post.file, **encoder_kwargs)
+        json_post["file"] = json_file
+
+    children = []
+    for child in db_post.children:
+        child_dict = jsonable_encoder(child, **encoder_kwargs)
+        if child.file:
+            child_file_dict = jsonable_encoder(child.file, **encoder_kwargs)
+            child_dict["file"] = child_file_dict
+        children.append(child_dict)
+
+    json_post["children"] = children
+
+    return json_post
 
 
 def _posts(
@@ -315,6 +345,7 @@ post = Annotated[schemas.Post, Depends(_post)]
 posts = Annotated[list[schemas.Post], Depends(_posts)]
 board = Annotated[schemas.Board, Depends(_board)]
 root_post = Annotated[schemas.Post, Depends(_root_post)]
+root_json_post = Annotated[schemas.Post, Depends(_root_json_post)]
 search_posts = Annotated[list[schemas.Post], Depends(_search_posts)]
 post_prechecks = Annotated[bool, Depends(_post_prechecks)]
 user = Annotated[schemas.User, Depends(_user)]

@@ -60,15 +60,27 @@ function createPost(post) {
         const file_source = `/uploads/${file.file_name}`;
 
         if (file.content_type.startsWith('image/')) {
-            const fileTemplate = document.createElement('img');
-            fileTemplate.src = file_source;
-            fileTemplate.classList.add('post-image');
-            clone.querySelector('.post-file').appendChild(fileTemplate);
+            const fileTemplate = document.querySelector('#file-image');
+            const fileClone = fileTemplate.content.cloneNode(true);
+
+            fileClone.querySelector('.post-image').src = file_source;
+            fileClone.querySelector('.post-image').classList.add('post-image');
+            // add click event listener to open image in new tab
+            fileClone.querySelector('.post-file-link').href = file_source;
+            fileClone.querySelector('.post-file-link').addEventListener('click', function (event) {
+                event.preventDefault();
+                // add class to image to make it full size
+                event.currentTarget.querySelector('.post-image').classList.toggle('full-size');
+                event.currentTarget.parentNode.parentNode.classList.toggle('flex-wrap-wrap');
+            });
+            clone.querySelector('.post-file').appendChild(fileClone);
         } else {
-            const fileTemplate = document.createElement('a');
-            fileTemplate.href = file_source;
-            fileTemplate.textContent = file.file_name;
-            clone.querySelector('.post-file').appendChild(fileTemplate);
+            const fileTemplate = document.querySelector('#file-other');
+            const fileClone = fileTemplate.content.cloneNode(true);
+
+            fileClone.querySelector('.post-file-link').href = file_source;
+            fileClone.querySelector('.post-file').textContent = `upload:[${file.file_name}]`;
+            clone.querySelector('.post-file').appendChild(fileClone);
         }
 
     }
