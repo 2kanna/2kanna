@@ -190,11 +190,15 @@ def _posts(
 
     for post in db_posts:
         # get 3 replies for each post ordered by latest_reply_date
-        post.children = db.post.get(
+        children = db.post.get(
             filter=[models.Post.parent_id == post.post_id],
             order_by=models.Post.latest_reply_date.desc(),
             limit=3,
         )
+        if children is not None:
+            post.children = children
+        else:
+            post.children = []
 
     if db_posts is None:
         raise HTTPException(status_code=404, detail="Posts not found")
