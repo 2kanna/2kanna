@@ -1,5 +1,6 @@
 import logging
 import sqlalchemy
+from sqlalchemy.sql.elements import UnaryExpression
 from sqlalchemy.orm.session import Session
 from typing import Optional
 
@@ -18,6 +19,8 @@ class Table:
         name: Optional[str] = None,
         table: Optional[sqlalchemy.Table] = None,
         filter: Optional[list] = False,
+        order_by: Optional[UnaryExpression] = None,
+        limit: int = 1,
     ):
         """Get an entity if one doesn't exist with the given name (or by given filter)
         Args:
@@ -32,7 +35,16 @@ class Table:
         if not filter:
             filter = [self.main_column == name]
 
-        entity = self._session.query(table).filter(*filter).first()
+        if limit == 1:
+            entity = self._session.query(table).filter(*filter).first()
+        else:
+            entity = (
+                self._session.query(table)
+                .filter(*filter)
+                .order_by(order_by)
+                .limit(limit)
+                .all()
+            )
 
         if entity:
             return entity
